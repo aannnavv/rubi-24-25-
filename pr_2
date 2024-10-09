@@ -1,0 +1,49 @@
+# Функція для перевірки чи є символ оператором
+def operator?(char)
+  ['+', '-', '*', '/'].include?(char)
+end
+
+# Пріоритет операторів
+def precedence(operator)
+  case operator
+  when '+', '-'
+    1
+  when '*', '/'
+    2
+  else
+    0
+  end
+end
+
+# Основна функція для перетворення виразу в RPN
+def to_rpn(expression)
+  output = []
+  operators = []
+
+  # Розбиваємо вираз на частини
+  tokens = expression.split
+
+  tokens.each do |token|
+    if token =~ /\d+/  # Якщо токен це число
+      output << token
+    elsif operator?(token)  # Якщо токен це оператор
+      while operators.any? && precedence(operators.last) >= precedence(token)
+        output << operators.pop
+      end
+      operators << token
+    end
+  end
+
+  # Додаємо залишкові оператори
+  output.concat(operators.reverse)
+
+  output.join(' ')
+end
+
+# Отримуємо вираз від користувача
+print "Введіть математичний вираз: "
+input_expression = gets.chomp
+
+# Виводимо результат
+rpn_output = to_rpn(input_expression)
+puts "RPN: #{rpn_output}"
