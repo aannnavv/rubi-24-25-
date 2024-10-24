@@ -1,0 +1,19 @@
+class Book
+  # Конструктор для ініціалізації назви та автора
+  def initialize(title, author)
+    @title = title
+    @author = author
+  end
+
+  # Метод для відображення інформації про книгу
+  def display_info
+    puts "Назва книги: #{@title}"
+    puts "Автор: #{@author}"
+  end
+end
+
+# Створення об’єкту класу Book
+my_book = Book.new("Війна і мир", "Лев Толстой")
+
+# Відображення інформації про книгу
+my_book.display_info
