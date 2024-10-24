@@ -1,0 +1,22 @@
+def remove_duplicates(arr)
+  arr.uniq
+end
+
+# Запитуємо користувача, щоб він ввів розмір масиву
+puts "Введіть розмір масиву:"
+size = gets.to_i
+
+# Створюємо порожній масив
+array = []
+
+# Запитуємо елементи масиву у користувача
+puts "Введіть #{size} елементів масиву:"
+size.times do
+  array << gets.to_i
+end
+
+# Видаляємо дублікати
+unique_array = remove_duplicates(array)
+
+# Виводимо масив без дублікатів
+puts "Масив без дублікатів: #{unique_array.inspect}"
