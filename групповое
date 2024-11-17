@@ -1,0 +1,44 @@
+class LRUCache
+  def initialize(capacity)
+    @capacity = capacity
+    @cache = {}
+    @order = [] # список для відстеження порядку використання ключів
+  end
+
+  def get(key)
+    if @cache.key?(key)
+      # Оновлюємо порядок використання
+      @order.delete(key)
+      @order.push(key)
+      @cache[key]
+    else
+      nil
+    end
+  end
+
+  def put(key, value)
+    if @cache.key?(key)
+      # Оновлюємо значення і порядок використання
+      @order.delete(key)
+    elsif @cache.size >= @capacity
+      # Видаляємо найстаріший ключ
+      lru_key = @order.shift
+      @cache.delete(lru_key)
+    end
+
+    @cache[key] = value
+    @order.push(key)
+  end
+end
+
+# Приклад використання
+cache = LRUCache.new(2)
+cache.put(1, 1)
+cache.put(2, 2)
+puts cache.get(1) # Виведе: 1
+cache.put(3, 3) # Видаляється ключ 2
+puts cache.get(2) ? cache.get(2) : 'nil' # Виведе: nil
+cache.put(4, 4) # Видаляється ключ 1
+puts cache.get(1) ? cache.get(1) : 'nil' # Виведе: nil
+puts cache.get(3) # Виведе: 3
+puts cache.get(4) # Виведе: 4
