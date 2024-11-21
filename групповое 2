@@ -1,0 +1,99 @@
+class ProjectDSL
+  def initialize(&block)
+    @tasks = []
+    instance_eval(&block) if block_given?
+  end
+
+  def task(name, &block)
+    task = Task.new(name)
+    task.instance_eval(&block) if block_given?
+    @tasks << task
+  end
+
+  def tasks
+    @tasks.each do |task|
+      puts "Task: #{task.name}"
+      puts "  Description: #{task.description || 'No description provided'}"
+      puts "  Assigned to: #{task.assigned_to || 'Not assigned'}"
+      puts "  Deadline: #{task.deadline || 'No deadline specified'}"
+      puts "  Status: #{task.status || 'No status provided'}"
+      puts "------------------------"
+    end
+  end
+
+  class Task
+    attr_reader :name, :description, :assigned_to, :deadline, :status
+
+    def initialize(name)
+      @name = name
+      @description = nil
+      @assigned_to = nil
+      @deadline = nil
+      @status = nil
+    end
+
+    def description(text = nil)
+      if text.nil?
+        @description
+      else
+        @description = text
+      end
+    end
+
+    def assigned_to(person = nil)
+      if person.nil?
+        @assigned_to
+      else
+        @assigned_to = person
+      end
+    end
+
+    def deadline(date = nil)
+      if date.nil?
+        @deadline
+      else
+        @deadline = date
+      end
+    end
+
+    def status(state = nil)
+      if state.nil?
+        @status
+      else
+        @status = state
+      end
+    end
+  end
+end
+
+# Інтерактивне введення даних користувачем
+puts "Скільки завдань ви хочете створити?"
+task_count = gets.chomp.to_i
+
+project = ProjectDSL.new do
+  task_count.times do |i|
+    puts "\nВведіть назву для завдання #{i + 1}:"
+    task_name = gets.chomp
+
+    task task_name do
+      puts "Введіть опис для завдання (або залиште порожнім):"
+      desc = gets.chomp
+      description(desc) unless desc.empty?
+
+      puts "Кому призначити завдання (або залиште порожнім):"
+      person = gets.chomp
+      assigned_to(person) unless person.empty?
+
+      puts "Введіть кінцеву дату для завдання (у форматі YYYY-MM-DD або залиште порожнім):"
+      date = gets.chomp
+      deadline(date) unless date.empty?
+
+      puts "Введіть статус завдання (або залиште порожнім):"
+      state = gets.chomp
+      status(state) unless state.empty?
+    end
+  end
+end
+
+puts "\nОсь ваші завдання:"
+project.tasks
