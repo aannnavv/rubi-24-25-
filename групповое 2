@@ -1,65 +1,65 @@
 class ProjectDSL
-  def initialize(&block)
-    @tasks = []
-    instance_eval(&block) if block_given?
+  def initialize(&block) # Ініціалізуємо проект і передаємо блок для конфігурації завдань, якщо він є
+    @tasks = []          # Створюємо порожній масив для збереження завдань
+    instance_eval(&block) if block_given? # Виконуємо переданий блок у контексті об'єкта
   end
 
-  def task(name, &block)
-    task = Task.new(name)
-    task.instance_eval(&block) if block_given?
-    @tasks << task
+  def task(name, &block) # Метод для створення нового завдання з ім'ям і можливим блоком конфігурації
+    task = Task.new(name) # Створюємо новий об'єкт Task з переданою назвою
+    task.instance_eval(&block) if block_given? # Виконуємо блок для налаштування завдання, якщо він є
+    @tasks << task # Додаємо налаштоване завдання до списку
   end
 
-  def tasks
-    @tasks.each do |task|
-      puts "Task: #{task.name}"
-      puts "  Description: #{task.description || 'No description provided'}"
-      puts "  Assigned to: #{task.assigned_to || 'Not assigned'}"
-      puts "  Deadline: #{task.deadline || 'No deadline specified'}"
-      puts "  Status: #{task.status || 'No status provided'}"
-      puts "------------------------"
+  def tasks # Метод для виведення всіх завдань у зручному форматі
+    @tasks.each do |task| # Ітеруємо по всіх завданнях
+      puts "Task: #{task.name}" # Виводимо назву завдання
+      puts "  Description: #{task.description || 'No description provided'}" # Виводимо опис або текст за замовчуванням
+      puts "  Assigned to: #{task.assigned_to || 'Not assigned'}" # Виводимо відповідального або текст за замовчуванням
+      puts "  Deadline: #{task.deadline || 'No deadline specified'}" # Виводимо дедлайн або текст за замовчуванням
+      puts "  Status: #{task.status || 'No status provided'}" # Виводимо статус або текст за замовчуванням
+      puts "------------------------" # Розділювач між завданнями
     end
   end
 
   class Task
-    attr_reader :name, :description, :assigned_to, :deadline, :status
+    attr_reader :name, :description, :assigned_to, :deadline, :status # Визначаємо атрибути, які можна читати
 
-    def initialize(name)
-      @name = name
-      @description = nil
-      @assigned_to = nil
-      @deadline = nil
-      @status = nil
+    def initialize(name) # Ініціалізуємо завдання з обов'язковою назвою
+      @name = name        # Задаємо назву
+      @description = nil  # Ініціалізуємо опис як nil
+      @assigned_to = nil  # Ініціалізуємо відповідального як nil
+      @deadline = nil     # Ініціалізуємо дедлайн як nil
+      @status = nil       # Ініціалізуємо статус як nil
     end
 
-    def description(text = nil)
-      if text.nil?
+    def description(text = nil) # Метод для читання/запису опису
+      if text.nil?              # Якщо аргумент не переданий, повертаємо поточний опис
         @description
-      else
+      else                      # Інакше оновлюємо опис
         @description = text
       end
     end
 
-    def assigned_to(person = nil)
-      if person.nil?
+    def assigned_to(person = nil) # Метод для читання/запису відповідального
+      if person.nil?              # Якщо аргумент не переданий, повертаємо поточний відповідальний
         @assigned_to
-      else
+      else                        # Інакше оновлюємо відповідального
         @assigned_to = person
       end
     end
 
-    def deadline(date = nil)
-      if date.nil?
+    def deadline(date = nil) # Метод для читання/запису дедлайну
+      if date.nil?           # Якщо аргумент не переданий, повертаємо поточний дедлайн
         @deadline
-      else
+      else                   # Інакше оновлюємо дедлайн
         @deadline = date
       end
     end
 
-    def status(state = nil)
-      if state.nil?
+    def status(state = nil) # Метод для читання/запису статусу
+      if state.nil?         # Якщо аргумент не переданий, повертаємо поточний статус
         @status
-      else
+      else                  # Інакше оновлюємо статус
         @status = state
       end
     end
@@ -67,33 +67,33 @@ class ProjectDSL
 end
 
 # Інтерактивне введення даних користувачем
-puts "Скільки завдань ви хочете створити?"
-task_count = gets.chomp.to_i
+puts "Скільки завдань ви хочете створити?" # Запитуємо кількість завдань
+task_count = gets.chomp.to_i # Зчитуємо введення користувача і перетворюємо його на ціле число
 
-project = ProjectDSL.new do
-  task_count.times do |i|
-    puts "\nВведіть назву для завдання #{i + 1}:"
-    task_name = gets.chomp
+project = ProjectDSL.new do # Створюємо новий проект і передаємо блок для опису завдань
+  task_count.times do |i| # Ітеруємо стільки разів, скільки завдань ввів користувач
+    puts "\nВведіть назву для завдання #{i + 1}:" # Запитуємо назву завдання
+    task_name = gets.chomp # Зчитуємо назву завдання
 
-    task task_name do
-      puts "Введіть опис для завдання (або залиште порожнім):"
-      desc = gets.chomp
-      description(desc) unless desc.empty?
+    task task_name do # Додаємо нове завдання з вказаною назвою
+      puts "Введіть опис для завдання (або залиште порожнім):" # Запитуємо опис
+      desc = gets.chomp # Зчитуємо опис
+      description(desc) unless desc.empty? # Якщо опис не порожній, зберігаємо його
 
-      puts "Кому призначити завдання (або залиште порожнім):"
-      person = gets.chomp
-      assigned_to(person) unless person.empty?
+      puts "Кому призначити завдання (або залиште порожнім):" # Запитуємо відповідального
+      person = gets.chomp # Зчитуємо відповідального
+      assigned_to(person) unless person.empty? # Якщо поле не порожнє, зберігаємо його
 
-      puts "Введіть кінцеву дату для завдання (у форматі YYYY-MM-DD або залиште порожнім):"
-      date = gets.chomp
-      deadline(date) unless date.empty?
+      puts "Введіть кінцеву дату для завдання (у форматі YYYY-MM-DD або залиште порожнім):" # Запитуємо дедлайн
+      date = gets.chomp # Зчитуємо дедлайн
+      deadline(date) unless date.empty? # Якщо поле не порожнє, зберігаємо його
 
-      puts "Введіть статус завдання (або залиште порожнім):"
-      state = gets.chomp
-      status(state) unless state.empty?
+      puts "Введіть статус завдання (або залиште порожнім):" # Запитуємо статус
+      state = gets.chomp # Зчитуємо статус
+      status(state) unless state.empty? # Якщо поле не порожнє, зберігаємо його
     end
   end
 end
 
-puts "\nОсь ваші завдання:"
-project.tasks
+puts "\nОсь ваші завдання:" # Виводимо заголовок
+project.tasks # Виводимо всі завдання у форматі, заданому методом tasks
