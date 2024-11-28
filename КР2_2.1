@@ -1,0 +1,65 @@
+require 'thread'
+
+# Ініціалізація каталогу
+catalog = []
+
+# Запит на введення файлів з можливістю обрати автоматичне додавання для тестування
+puts "Ви хочете вручну ввести імена файлів? (так/ні)"
+user_input = gets.chomp.downcase
+
+if user_input == 'так'
+  puts "Введіть імена файлів (введіть 'стоп' для завершення):"
+  loop do
+    print "> "
+    file_name = gets.chomp
+    break if file_name.downcase == 'стоп'
+    catalog << file_name
+  end
+else
+  # Автоматично додаємо файли для тестування
+  catalog = ["file1.txt", "document.pdf", "photo.jpg", "report.docx"]
+  puts "Файли додані до каталогу автоматично: #{catalog.join(', ')}"
+end
+
+# Перевірка на порожній каталог
+if catalog.empty?
+  puts "Каталог порожній. Завершення програми."
+  exit
+end
+
+# М'ютекс для синхронізації виведення
+mutex = Mutex.new
+
+# Черга для потоків
+queue = Queue.new
+catalog.each { |file| queue << file }
+
+# Метод обробки файлу (наприклад, кількість символів у імені файлу)
+def process_filename(file_name)
+  file_name.length
+end
+
+# Кількість потоків
+thread_count = 4
+threads = []
+
+thread_count.times do
+  threads << Thread.new do
+    until queue.empty?
+      file = queue.pop(true) rescue nil
+      next unless file
+
+      result = process_filename(file)
+
+      mutex.synchronize do
+        puts "Файл: #{file}, Кількість символів в імені: #{result}"
+      end
+    end
+  end
+end
+
+# Очікування завершення всіх потоків
+threads.each(&:join)
+
+puts "Обробка файлів завершена."
+
