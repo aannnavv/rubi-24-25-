@@ -1,0 +1,50 @@
+require 'thread'
+
+# Шляхи до файлів
+input_file = 'input.txt'
+output_file = 'output.txt'
+
+# Створення файлів для тесту (опціонально)
+File.write(input_file, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10")
+
+# Читання чисел із вхідного файлу
+numbers = File.readlines(input_file).map(&:to_i)
+
+# Черга для обробки чисел
+queue = Queue.new
+numbers.each { |num| queue << num }
+
+# М'ютекс для синхронізації доступу до файлу
+mutex = Mutex.new
+
+# Метод обробки чисел
+def process_number(number)
+  number ** 2
+end
+
+# Масив потоків
+threads = []
+thread_count = 4
+
+# Створення потоків
+thread_count.times do
+  threads << Thread.new do
+    until queue.empty?
+      number = queue.pop(true) rescue nil
+      next unless number
+
+      square = process_number(number)
+
+      mutex.synchronize do
+        # Запис квадрата числа у вихідний файл
+        File.open(output_file, 'a') { |f| f.puts(square) }
+      end
+    end
+  end
+end
+
+# Очікування завершення всіх потоків
+threads.each(&:join)
+
+puts "Обробка завершена. Квадрати чисел записано у файл '#{output_file}'."
+
