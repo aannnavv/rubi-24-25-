@@ -1,0 +1,57 @@
+class RetryExecutor
+  def initialize(retries: 3, delay: 0)
+    @retries = retries
+    @delay = delay
+  end
+
+  def execute
+    attempts = 0
+
+    begin
+      attempts += 1
+      yield # Виконання блоку
+    rescue => e
+      if attempts <= @retries
+        puts "Спроба #{attempts} не вдалася: #{e.message}. Повтор через #{@delay} секунд..."
+        sleep(@delay) if @delay > 0
+        retry
+      else
+        puts "Спроби вичерпано. Остання помилка: #{e.message}"
+        raise
+      end
+    else
+      puts "Успішно виконано на спробі #{attempts}" # Вивід, якщо блок успішно виконався
+    end
+  end
+end
+
+# Приклад використання
+
+# 1. Успішне виконання
+puts "=== Успішний блок ==="
+executor = RetryExecutor.new(retries: 3, delay: 1)
+executor.execute do
+  puts "Цей код виконується успішно!"
+end
+
+# 2. Блок із помилками, які виправляються
+puts "\n=== Блок із помилками ==="
+counter = 0
+executor = RetryExecutor.new(retries: 3, delay: 2)
+executor.execute do
+  counter += 1
+  puts "Спроба #{counter}"
+  raise "Тестова помилка!" if counter < 3
+end
+
+# 3. Блок із постійними помилками
+puts "\n=== Блок із постійними помилками ==="
+executor = RetryExecutor.new(retries: 2, delay: 1)
+begin
+  executor.execute do
+    puts "Цей блок завжди викидає помилку."
+    raise "Фатальна помилка!"
+  end
+rescue => e
+  puts "Остаточна помилка: #{e.message}"
+end
